@@ -34,7 +34,7 @@
                         <Insets left="10.0" top="15.0" />
                      </HBox.margin>
                   </Label>
-                  <ComboBox prefWidth="150.0">
+                  <ComboBox fx:id="boxCorsi" prefHeight="25.0" prefWidth="321.0">
                      <HBox.margin>
                         <Insets left="20.0" top="10.0" />
                      </HBox.margin>
