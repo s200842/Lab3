@@ -57,11 +57,26 @@ public class SegreteriaStudentiController {
 
     @FXML
     void doAutoComplete(ActionEvent event) {
-
+    	String matricola = txtInput.getText();
+    	String nomeStudente = model.getStudente(matricola).getNomeStudente();
+    	String cognomeStudente = model.getStudente(matricola).getCognomeStudente();
+    	//Gestione matricola inesistente
+    	if(nomeStudente == null || cognomeStudente == null){
+    		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+    	}
+    	else{
+    		txtNome.setText(nomeStudente);
+        	txtCognome.setText(cognomeStudente);
+    	}
+    	btnAutoComplete.setDisable(true);
     }
 
     @FXML
     void doCerca(ActionEvent event) {
+    	//Tutti gli studenti iscritti ad un corso -> Selezionato solo il corso dal menu a tendina
+    	if((boxCorsi.getValue() != "") && (txtInput.getText().compareTo("")==0)){
+    		
+    	}
 
     }
 
@@ -76,6 +91,7 @@ public class SegreteriaStudentiController {
     	txtNome.clear();
     	txtCognome.clear();
     	txtResult.clear();
+    	btnAutoComplete.setDisable(false);
     }
 
     @FXML

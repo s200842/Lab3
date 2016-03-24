@@ -26,6 +26,8 @@ public class CorsoDAO {
 				String nomeCorso = res.getString("nome");
 				elencoCorsiDB.add(nomeCorso);
 			}
+			res.close();
+			c.close();
 			return elencoCorsiDB;
 			
 		} catch (SQLException e) {
