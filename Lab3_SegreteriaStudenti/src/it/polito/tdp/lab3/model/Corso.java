@@ -7,9 +7,9 @@ public class Corso {
 	private String codIns;
 	private int crediti;
 	private String nomeCorso;
-	private String periodoDidattico;
+	private int periodoDidattico;
 	
-	public Corso(String codIns, int crediti, String nomeCorso, String periodoDidattico) {
+	public Corso(String codIns, int crediti, String nomeCorso, int periodoDidattico) {
 		this.codIns = codIns;
 		this.crediti = crediti;
 		this.nomeCorso = nomeCorso;
@@ -40,11 +40,11 @@ public class Corso {
 		this.nomeCorso = nomeCorso;
 	}
 
-	public String getPeriodoDidattico() {
+	public int getPeriodoDidattico() {
 		return periodoDidattico;
 	}
 
-	public void setPeriodoDidattico(String periodoDidattico) {
+	public void setPeriodoDidattico(int periodoDidattico) {
 		this.periodoDidattico = periodoDidattico;
 	}
 
@@ -73,7 +73,9 @@ public class Corso {
 		return true;
 	}
 	
-	
+	public String toString(){
+		return nomeCorso;
+	}
 	
 
 }

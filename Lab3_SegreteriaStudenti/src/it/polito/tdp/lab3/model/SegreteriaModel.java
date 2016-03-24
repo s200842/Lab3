@@ -7,17 +7,21 @@ import it.polito.tdp.lab3.db.StudenteDAO;
 
 public class SegreteriaModel {
 	
-	private List<String> elencoCorsi;
+	private List<Corso> elencoCorsi;
 	
 	public SegreteriaModel(){
-		elencoCorsi = new ArrayList<String>();
+		elencoCorsi = new ArrayList<Corso>();
 	}
 	
-	public List<String> getCorsi(){
+	//Popola la comboBox con i corsi del DB
+	
+	public List<Corso> getCorsi(){
 		CorsoDAO dao = new CorsoDAO();
 		elencoCorsi = dao.getCorsiFromDB();
 		return elencoCorsi;
 	}
+	
+	//Data una matricola fornisce lo studente
 	
 	public Studente getStudente(String matricola){
 		StudenteDAO dao = new StudenteDAO();
@@ -28,5 +32,23 @@ public class SegreteriaModel {
 		}
 		else return stemp;
 	}
-
+	
+	//Dato un corso, fornisce la lista di studenti che lo seguono
+	
+	public String segueCorso(Corso corso){
+		List<Studente> studentiCorso = new ArrayList<Studente>();
+		StudenteDAO dao = new StudenteDAO();
+		List<String> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(corso);
+		//Popolo la lista di studenti per scriverli in un'unica stringa
+		for(String matricola : matricoleCorso){
+			Studente stemp = this.getStudente(matricola);
+			studentiCorso.add(stemp);
+		}
+		String result = "";
+		for(Studente stemp : studentiCorso){
+			result += stemp.toString()+"\n";
+		}
+		return result;
+		
+	}
 }

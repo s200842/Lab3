@@ -73,7 +73,9 @@ public class Studente {
 		return true;
 	}
 	
-	
+	public String toString(){
+		return matricola+"   "+nomeStudente+" "+cognomeStudente+" "+corsoStudi;
+	}
 	
 	
 

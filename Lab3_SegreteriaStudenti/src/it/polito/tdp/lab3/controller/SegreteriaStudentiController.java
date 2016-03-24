@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.lab3.model.Corso;
 import it.polito.tdp.lab3.model.SegreteriaModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,7 +16,7 @@ import javafx.scene.control.TextField;
 public class SegreteriaStudentiController {
 
 	@FXML
-    private ComboBox<String> boxCorsi;
+    private ComboBox<Corso> boxCorsi;
 	
 	@FXML
     private ResourceBundle resources;
@@ -51,7 +52,7 @@ public class SegreteriaStudentiController {
     
     public void setModel(SegreteriaModel model){
     	this.model = model;
-    	 List<String> elencoCorsi = model.getCorsi();
+    	 List<Corso> elencoCorsi = model.getCorsi();
          boxCorsi.getItems().addAll(elencoCorsi);
     }
 
@@ -73,8 +74,14 @@ public class SegreteriaStudentiController {
 
     @FXML
     void doCerca(ActionEvent event) {
+    	txtResult.clear();
     	//Tutti gli studenti iscritti ad un corso -> Selezionato solo il corso dal menu a tendina
-    	if((boxCorsi.getValue() != "") && (txtInput.getText().compareTo("")==0)){
+    	if((boxCorsi.getValue().toString() != "") && (txtInput.getText().compareTo("")==0)){
+    		Corso corso = boxCorsi.getValue();
+    		txtResult.setText(model.segueCorso(corso));
+    	}
+    	//Tutti i corsi a cui è iscritto uno studente -> Nessun corso selezionato, solo matricola
+    	else if((boxCorsi.getValue().toString().compareTo("") == 0)&&(txtInput.getText().compareTo("") != 0)){
     		
     	}
 

@@ -7,24 +7,30 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+import it.polito.tdp.lab3.model.Corso;
+
 //Classe per l'accesso al DB
 
 public class CorsoDAO {
 	
-	public List<String> getCorsiFromDB(){
+	public List<Corso> getCorsiFromDB(){
 		//Apertura connessione con database
 		try {
 			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
 			Connection c = DriverManager.getConnection(jdbcURL);
 			Statement st = c.createStatement();
-			String sql = "SELECT nome FROM corso";
+			String sql = "SELECT * FROM corso";
 			ResultSet res = st.executeQuery(sql);
 			//Elaborazione risultati
-			List<String> elencoCorsiDB = new ArrayList<String>();
-			elencoCorsiDB.add("");
+			List<Corso> elencoCorsiDB = new ArrayList<Corso>();
+			elencoCorsiDB.add(new Corso("", 0, "", 0));
 			while(res.next()){
+				String codIns = res.getString("codins");
+				int crediti = res.getInt("crediti");
 				String nomeCorso = res.getString("nome");
-				elencoCorsiDB.add(nomeCorso);
+				int pd = res.getInt("pd");
+				Corso ctemp = new Corso(codIns, crediti, nomeCorso, pd);
+				elencoCorsiDB.add(ctemp);
 			}
 			res.close();
 			c.close();
