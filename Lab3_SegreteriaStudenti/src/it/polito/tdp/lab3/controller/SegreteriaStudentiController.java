@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import it.polito.tdp.lab3.model.Corso;
 import it.polito.tdp.lab3.model.SegreteriaModel;
+import it.polito.tdp.lab3.model.Studente;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -54,6 +55,7 @@ public class SegreteriaStudentiController {
     	this.model = model;
     	 List<Corso> elencoCorsi = model.getCorsi();
          boxCorsi.getItems().addAll(elencoCorsi);
+         boxCorsi.setValue(elencoCorsi.get(0));
     }
 
     @FXML
@@ -73,16 +75,39 @@ public class SegreteriaStudentiController {
     }
 
     @FXML
-    void doCerca(ActionEvent event) {
+    void doCerca(ActionEvent event) { //CHIEDERE A BOSS PER IL MENU A TENDINA!
     	txtResult.clear();
+    	
+    	//Controllo selezione corso
+    	if(boxCorsi.getValue()==null){
+    		txtResult.setText("Selezionare un corso, oppure lo spazio vuoto se non si desidera specificare alcun corso");
+    		return;
+    	}
+    	
     	//Tutti gli studenti iscritti ad un corso -> Selezionato solo il corso dal menu a tendina
+    	
     	if((boxCorsi.getValue().toString() != "") && (txtInput.getText().compareTo("")==0)){
     		Corso corso = boxCorsi.getValue();
     		txtResult.setText(model.segueCorso(corso));
     	}
+    	
     	//Tutti i corsi a cui è iscritto uno studente -> Nessun corso selezionato, solo matricola
+    	
     	else if((boxCorsi.getValue().toString().compareTo("") == 0)&&(txtInput.getText().compareTo("") != 0)){
-    		
+    		Studente stemp = model.getStudente(txtInput.getText());
+    		//Gestione matricola inesistente
+        	if(stemp.getNomeStudente() == null || stemp.getCognomeStudente() == null){
+        		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+        	}
+        	else{
+        		txtResult.setText(model.corsoStudente(stemp));
+        	}
+    	}
+    	
+    	//Ricerca singolo studente iscritto ad un singolo corso -> matricola E corso selezionati
+    	
+    	else if((boxCorsi.getValue().toString() != "") && (txtInput.getText() != "")){
+    		System.out.println("Entrato nell'if");
     	}
 
     }
@@ -99,6 +124,7 @@ public class SegreteriaStudentiController {
     	txtCognome.clear();
     	txtResult.clear();
     	btnAutoComplete.setDisable(false);
+    	boxCorsi.setValue(boxCorsi.getItems().get(0));
     }
 
     @FXML

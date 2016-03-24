@@ -77,5 +77,9 @@ public class Corso {
 		return nomeCorso;
 	}
 	
+	public String toStringCompleto(){
+		return codIns+"  "+crediti+"  "+nomeCorso+"    "+"pd: "+periodoDidattico;
+	}
+	
 
 }

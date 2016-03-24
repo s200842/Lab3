@@ -49,6 +49,24 @@ public class SegreteriaModel {
 			result += stemp.toString()+"\n";
 		}
 		return result;
+	}
+	
+		//Dato uno studente, fornisce i corsi seguiti
+	
+	public String corsoStudente(Studente s){
+		CorsoDAO dao = new CorsoDAO();
+		List<Corso> corsiStudente = dao.getCorsoFromDB(s);
+		//Gestione studente senza corsi
+		if(corsiStudente == null){
+			return String.format("Lo studente %s %s non è iscritto ad alcun corso.", s.getNomeStudente(), s.getCognomeStudente());
+		}
+		else{
+			String result = "";
+			for(Corso c : corsiStudente){
+				result += c.toStringCompleto()+"\n";
+			}
+			return result;
+		}
 		
 	}
 }

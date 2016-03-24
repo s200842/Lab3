@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.*;
 
 import it.polito.tdp.lab3.model.Corso;
+import it.polito.tdp.lab3.model.Studente;
 
 //Classe per l'accesso al DB
 
@@ -40,6 +41,49 @@ public class CorsoDAO {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public List<Corso> getCorsoFromDB(Studente s){
+		//Apertura connessione con database
+		try {
+			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
+			Connection c = DriverManager.getConnection(jdbcURL);
+			Statement st = c.createStatement();
+			String sql = "SELECT codins FROM iscrizione WHERE matricola = '"+s.getMatricola()+"';";
+			ResultSet res = st.executeQuery(sql);
+			//Elaborazione risultati; Qui ho una lista di codici insegnamento relativi ai corsi seguiti dallo studente s
+			List<String> elencoCodCorsiStudente = new ArrayList<String>();
+			while(res.next()){
+				String codIns = res.getString("codins");
+				elencoCodCorsiStudente.add(codIns);
+			}
+			//Eventuale studente senza corsi
+			if(elencoCodCorsiStudente.size()==0){
+				return null;
+			}
+			res.close();
+			//Per ogni codins genero il corso corrispondente e lo salvo in una lista
+			List<Corso> elencoCorsiStudente = new ArrayList<Corso>();
+			for(String codins : elencoCodCorsiStudente){
+				String sql2 = "SELECT crediti, nome, pd FROM corso WHERE codins = '"+codins+"';";
+				ResultSet res2 = st.executeQuery(sql2);
+				while(res2.next()){
+					int crediti = res2.getInt("crediti");
+					String nomeCorso = res2.getString("nome");
+					int pd = res2.getInt("pd");
+					Corso ctemp = new Corso(codins, crediti, nomeCorso, pd);
+					elencoCorsiStudente.add(ctemp);
+				}
+				res2.close();
+			}			
+			c.close();
+			return elencoCorsiStudente;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 	
 	
