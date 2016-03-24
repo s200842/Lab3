@@ -47,7 +47,7 @@ public class Studente {
 	public void setCorsoStudi(String corsoStudi) {
 		this.corsoStudi = corsoStudi;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -72,7 +72,7 @@ public class Studente {
 			return false;
 		return true;
 	}
-	
+
 	public String toString(){
 		return matricola+"   "+nomeStudente+" "+cognomeStudente+" "+corsoStudi;
 	}

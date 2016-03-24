@@ -20,7 +20,7 @@ public class StudenteDAO {
 			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
 			Connection c = DriverManager.getConnection(jdbcURL);
 			Statement st = c.createStatement();
-			//Gestione matricola vuota
+			//Gestione matricola vuota o non numerica
 			if(matricola.compareTo("")==0){
 				return null;
 			}

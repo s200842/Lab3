@@ -64,7 +64,7 @@ public class SegreteriaStudentiController {
     	String nomeStudente = model.getStudente(matricola).getNomeStudente();
     	String cognomeStudente = model.getStudente(matricola).getCognomeStudente();
     	//Gestione matricola inesistente
-    	if(nomeStudente == null || cognomeStudente == null){
+    	if(nomeStudente == null || cognomeStudente == null){ //aggiungere controllo numerico
     		txtResult.setText("La matricola selezionata non è presente nel DataBase");
     	}
     	else{
@@ -75,11 +75,15 @@ public class SegreteriaStudentiController {
     }
 
     @FXML
-    void doCerca(ActionEvent event) { //CHIEDERE A BOSS PER IL MENU A TENDINA!
+    void doCerca(ActionEvent event) {
     	txtResult.clear();
-    	
-    	//Controllo selezione corso
-    	if(boxCorsi.getValue()==null){
+    	btnAutoComplete.setDisable(true);
+    	txtNome.setDisable(true);
+    	txtCognome.setDisable(true);
+    	Studente stemp = model.getStudente(txtInput.getText());
+    	Corso ctemp = boxCorsi.getValue();
+    	//CONTROLLI PRELIMINARI : Controllo selezione corso
+    	if(ctemp == null){
     		txtResult.setText("Selezionare un corso, oppure lo spazio vuoto se non si desidera specificare alcun corso");
     		return;
     	}
@@ -94,33 +98,63 @@ public class SegreteriaStudentiController {
     	//Tutti i corsi a cui è iscritto uno studente -> Nessun corso selezionato, solo matricola
     	
     	else if((boxCorsi.getValue().toString().compareTo("") == 0)&&(txtInput.getText().compareTo("") != 0)){
-    		Studente stemp = model.getStudente(txtInput.getText());
-    		//Gestione matricola inesistente
-        	if(stemp.getNomeStudente() == null || stemp.getCognomeStudente() == null){
+    		//Controllo matricola inesistente o errata
+        	if(stemp.getMatricola() == null ){
         		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+        		return;
         	}
-        	else{
-        		txtResult.setText(model.corsoStudente(stemp));
-        	}
+    		txtResult.setText(model.corsoStudente(stemp));
     	}
     	
     	//Ricerca singolo studente iscritto ad un singolo corso -> matricola E corso selezionati
     	
     	else if((boxCorsi.getValue().toString() != "") && (txtInput.getText() != "")){
-    		System.out.println("Entrato nell'if");
+    		//Controllo matricola inesistente o errata
+        	if(stemp.getMatricola() == null ){
+        		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+        		return;
+        	}
+        	else if(model.corsoHaStudente(ctemp, stemp)){
+        		txtResult.setText(String.format("%s %s (%s) è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
+        	}
+        	else{
+        		txtResult.setText(String.format("%s %s (%s) non è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
+        	}
+    		
     	}
 
     }
 
     @FXML
     void doInserisci(ActionEvent event) {
-
+    	txtResult.clear();
+    	btnAutoComplete.setDisable(true);
+    	txtNome.setDisable(true);
+    	txtCognome.setDisable(true);
+    	Studente stemp = model.getStudente(txtInput.getText());
+    	Corso ctemp = boxCorsi.getValue();
+    	//CONTROLLI PRELIMINARI : Controllo selezione corso
+    	if(ctemp == null || ctemp.getNomeCorso().compareTo("") == 0){
+    		txtResult.setText("Selezionare un corso a cui si desidera iscrivere lo studente.");
+    		return;
+    	}
+    	//CONTROLLI PRELIMINARI : Controllo matricola inesistente o errata
+    	if((stemp.getMatricola().compareTo("") == 0) || (stemp.getMatricola().matches("[0-9]") == false)){
+    		txtResult.setText("La matricola selezionata non è scritta nel formato corretto o non è stata inserita.");
+    		return;
+    	}
+    	
+    	//Controlla se lo studente è già iscritto al corso specificato
+    	
+    	
     }
 
     @FXML
     void doReset(ActionEvent event) {
     	txtInput.clear();
     	txtNome.clear();
+    	txtNome.setDisable(false);
+    	txtCognome.setDisable(false);
     	txtCognome.clear();
     	txtResult.clear();
     	btnAutoComplete.setDisable(false);

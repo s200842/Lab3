@@ -51,7 +51,7 @@ public class SegreteriaModel {
 		return result;
 	}
 	
-		//Dato uno studente, fornisce i corsi seguiti
+	//Dato uno studente, fornisce i corsi seguiti
 	
 	public String corsoStudente(Studente s){
 		CorsoDAO dao = new CorsoDAO();
@@ -66,7 +66,19 @@ public class SegreteriaModel {
 				result += c.toStringCompleto()+"\n";
 			}
 			return result;
+		}	
+	}
+	
+	//Dati un corso ed uno studente, verifica se lo studente è iscritto a quel corso
+	
+	public boolean corsoHaStudente(Corso c, Studente s){
+		StudenteDAO dao = new StudenteDAO();
+		List<String> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(c);
+		if(matricoleCorso.contains(s.getMatricola())){
+			return true;
 		}
-		
+		else{
+			return false;
+		}
 	}
 }
