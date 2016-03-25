@@ -74,6 +74,7 @@ public class SegreteriaStudentiController {
             	txtCognome.setText(cognomeStudente);
         	}
         	btnAutoComplete.setDisable(true);
+        	txtResult.clear();
     	}
     	catch(NumberFormatException e){
     		//La matricola è vuota
@@ -94,54 +95,53 @@ public class SegreteriaStudentiController {
     	btnAutoComplete.setDisable(true);
     	txtNome.setDisable(true);
     	txtCognome.setDisable(true);
-    	Corso ctemp = boxCorsi.getValue();
-    	Studente stemp;
     	
-    	//CONTROLLO MATRICOLA
-    	try{
-    		stemp = model.getStudente(Integer.parseInt(txtInput.getText())); //Va bene contro il null per tutti gli if successivi
-    	}
-    	catch(Exception e){
-    		txtResult.setText("Formato matricola errato");
-    		return;
-    	}
-    	
-    	//CONTROLLO CORSO
-    	if(ctemp == null){
-    		txtResult.setText("Selezionare un corso, oppure lo spazio vuoto se non si desidera specificare alcun corso");
-    		return;
-    	}
-    	
-    	//Tutti gli studenti iscritti ad un corso -> Selezionato solo il corso dal menu a tendina
-    	if((boxCorsi.getValue().toString() != "") && (txtInput.getText().compareTo("")==0)){
-    		Corso corso = boxCorsi.getValue();
-    		txtResult.setText(model.segueCorso(corso));
-    	}
-    	
-    	//Tutti i corsi a cui è iscritto uno studente -> Nessun corso selezionato, solo matricola
-    	else if((boxCorsi.getValue().toString().compareTo("") == 0)&&(txtInput.getText().compareTo("") != 0)){
-    		try{
-    			txtResult.setText(model.corsoStudente(stemp));
-    		}catch(Exception e){
-    			txtResult.setText("Errore formato matricola");
-    		}
-    	}
-    	
-    	//Ricerca singolo studente iscritto ad un singolo corso -> matricola E corso selezionati
-    	else if((boxCorsi.getValue().toString() != "") && (txtInput.getText() != "")){
-    		try {
-				if(model.corsoHaStudente(ctemp, stemp)){
+    	try {
+    		Corso ctemp = boxCorsi.getValue();
+    		Studente stemp = model.getStudente(Integer.parseInt(txtInput.getText()));
+    		
+    		//CONTROLLO CORSO
+        	if(ctemp == null){
+        		txtResult.setText("Selezionare un corso, oppure lo spazio vuoto se non si desidera specificare alcun corso");
+        		return;
+        	}
+        	
+        	//Matricola valida. Se il corso è vuoto, mostro i corsi a cui è iscritto lo studente
+        	if(ctemp.toString().compareTo("") == 0){
+        		txtResult.setText(model.corsoStudente(stemp));	
+        	}
+        	//Matricola valida. Se è specificato un corso, controllo se lo studente segue quel corso
+        	else if(ctemp.toString() != ""){
+        		if(model.corsoHaStudente(ctemp, stemp)){
 					txtResult.setText(String.format("%s %s (%s) è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
 				}
 				else{
+					//Se lo studente esiste ne stampo nome e cognome, in caso contrario specifico che non esiste
+					if(stemp.getMatricola() == -1){
+						txtResult.setText("La matricola selezionata non è presente nel DataBase.");
+						return;
+					}
 					txtResult.setText(String.format("%s %s (%s) non è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
 				}
-			} catch (Exception e) {
-				txtResult.setText("Formato dati errato");
-			}
-    		
+        	}
     	}
-
+    	catch(NumberFormatException e){
+    		//La matricola è un campo vuoto
+    		if(txtInput.getText().compareTo("") == 0){ //Se ho selezionato un corso, mostra tutti gli studenti ad esso iscritti
+    			if(boxCorsi.getValue().toString() != ""){
+    				txtResult.setText(model.segueCorso(boxCorsi.getValue()));
+    			}
+    			else {
+        			txtResult.setText("Matricola non specificata oppure nessun corso selezionato.");
+        			return;
+        		}
+    		}
+    		//La matricola non è numerica
+    		else{
+    			txtResult.setText("Formato matricola errato");
+    			return;
+    		}
+    	}
     }
 
     @FXML

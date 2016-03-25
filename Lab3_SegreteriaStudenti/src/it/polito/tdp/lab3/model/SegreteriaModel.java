@@ -58,7 +58,12 @@ public class SegreteriaModel {
 		List<Corso> corsiStudente = dao.getCorsoFromDB(s);
 		//Gestione studente senza corsi
 		if(corsiStudente == null){
-			return String.format("Lo studente %s %s non è iscritto ad alcun corso.", s.getNomeStudente(), s.getCognomeStudente());
+			if(s.getMatricola() == -1){
+				return "Lo studente selezionato non è presente nel database.";
+			}
+			else{
+				return String.format("Lo studente %s %s non è iscritto ad alcun corso.", s.getNomeStudente(), s.getCognomeStudente());
+			}
 		}
 		else{
 			String result = "";
