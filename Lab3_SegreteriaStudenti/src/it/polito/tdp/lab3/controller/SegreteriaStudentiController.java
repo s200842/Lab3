@@ -59,19 +59,33 @@ public class SegreteriaStudentiController {
     }
 
     @FXML
-    void doAutoComplete(ActionEvent event) {
-    	String matricola = txtInput.getText();
-    	String nomeStudente = model.getStudente(matricola).getNomeStudente();
-    	String cognomeStudente = model.getStudente(matricola).getCognomeStudente();
-    	//Gestione matricola inesistente
-    	if(nomeStudente == null || cognomeStudente == null){ //aggiungere controllo numerico
-    		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+    void doAutoComplete(ActionEvent event) { 
+    	try {
+    		int matricola = Integer.parseInt(txtInput.getText());
+    		String nomeStudente = model.getStudente(matricola).getNomeStudente();
+        	String cognomeStudente = model.getStudente(matricola).getCognomeStudente();
+        	//La matricola è un numero ma non esiste nel DB
+        	if(nomeStudente == null || cognomeStudente == null){ 
+        		txtResult.setText("La matricola selezionata non è presente nel DataBase");
+        		return;
+        	}
+        	else{
+        		txtNome.setText(nomeStudente);
+            	txtCognome.setText(cognomeStudente);
+        	}
+        	btnAutoComplete.setDisable(true);
     	}
-    	else{
-    		txtNome.setText(nomeStudente);
-        	txtCognome.setText(cognomeStudente);
+    	catch(NumberFormatException e){
+    		//La matricola è vuota
+    		if(txtInput.getText().compareTo("") == 0){
+    			txtResult.setText("Inserire una matricola per l'autocompletamento.");
+    			return;
+    		}
+    		else{ //La matricola non è un numero
+    			txtResult.setText("Formato matricola errato.");
+    			return;
+    		}
     	}
-    	btnAutoComplete.setDisable(true);
     }
 
     @FXML
@@ -80,46 +94,51 @@ public class SegreteriaStudentiController {
     	btnAutoComplete.setDisable(true);
     	txtNome.setDisable(true);
     	txtCognome.setDisable(true);
-    	Studente stemp = model.getStudente(txtInput.getText());
     	Corso ctemp = boxCorsi.getValue();
-    	//CONTROLLI PRELIMINARI : Controllo selezione corso
+    	Studente stemp;
+    	
+    	//CONTROLLO MATRICOLA
+    	try{
+    		stemp = model.getStudente(Integer.parseInt(txtInput.getText())); //Va bene contro il null per tutti gli if successivi
+    	}
+    	catch(Exception e){
+    		txtResult.setText("Formato matricola errato");
+    		return;
+    	}
+    	
+    	//CONTROLLO CORSO
     	if(ctemp == null){
     		txtResult.setText("Selezionare un corso, oppure lo spazio vuoto se non si desidera specificare alcun corso");
     		return;
     	}
     	
     	//Tutti gli studenti iscritti ad un corso -> Selezionato solo il corso dal menu a tendina
-    	
     	if((boxCorsi.getValue().toString() != "") && (txtInput.getText().compareTo("")==0)){
     		Corso corso = boxCorsi.getValue();
     		txtResult.setText(model.segueCorso(corso));
     	}
     	
     	//Tutti i corsi a cui è iscritto uno studente -> Nessun corso selezionato, solo matricola
-    	
     	else if((boxCorsi.getValue().toString().compareTo("") == 0)&&(txtInput.getText().compareTo("") != 0)){
-    		//Controllo matricola inesistente o errata
-        	if(stemp.getMatricola() == null ){
-        		txtResult.setText("La matricola selezionata non è presente nel DataBase");
-        		return;
-        	}
-    		txtResult.setText(model.corsoStudente(stemp));
+    		try{
+    			txtResult.setText(model.corsoStudente(stemp));
+    		}catch(Exception e){
+    			txtResult.setText("Errore formato matricola");
+    		}
     	}
     	
     	//Ricerca singolo studente iscritto ad un singolo corso -> matricola E corso selezionati
-    	
     	else if((boxCorsi.getValue().toString() != "") && (txtInput.getText() != "")){
-    		//Controllo matricola inesistente o errata
-        	if(stemp.getMatricola() == null ){
-        		txtResult.setText("La matricola selezionata non è presente nel DataBase");
-        		return;
-        	}
-        	else if(model.corsoHaStudente(ctemp, stemp)){
-        		txtResult.setText(String.format("%s %s (%s) è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
-        	}
-        	else{
-        		txtResult.setText(String.format("%s %s (%s) non è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
-        	}
+    		try {
+				if(model.corsoHaStudente(ctemp, stemp)){
+					txtResult.setText(String.format("%s %s (%s) è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
+				}
+				else{
+					txtResult.setText(String.format("%s %s (%s) non è iscritto al corso \"%s\"", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.getNomeCorso()));
+				}
+			} catch (Exception e) {
+				txtResult.setText("Formato dati errato");
+			}
     		
     	}
 
@@ -131,21 +150,29 @@ public class SegreteriaStudentiController {
     	btnAutoComplete.setDisable(true);
     	txtNome.setDisable(true);
     	txtCognome.setDisable(true);
-    	Studente stemp = model.getStudente(txtInput.getText());
+    	
+    	Studente stemp = model.getStudente(Integer.parseInt(txtInput.getText()));
     	Corso ctemp = boxCorsi.getValue();
+    	
     	//CONTROLLI PRELIMINARI : Controllo selezione corso
     	if(ctemp == null || ctemp.getNomeCorso().compareTo("") == 0){
     		txtResult.setText("Selezionare un corso a cui si desidera iscrivere lo studente.");
     		return;
     	}
-    	//CONTROLLI PRELIMINARI : Controllo matricola inesistente o errata
-    	if((stemp.getMatricola().compareTo("") == 0) || (stemp.getMatricola().matches("[0-9]") == false)){
+    	//CONTROLLI PRELIMINARI : Controllo matricola inesistente
+    	if(stemp.getMatricola() == 0){
     		txtResult.setText("La matricola selezionata non è scritta nel formato corretto o non è stata inserita.");
     		return;
     	}
-    	
     	//Controlla se lo studente è già iscritto al corso specificato
-    	
+    	//CONTROLLI PRELIMINARI : Controllo matricola non numerica
+    	try{
+    		Integer.parseInt(txtInput.getText());
+    	} 
+    	catch(NumberFormatException e){
+    		txtResult.setText("La matricola inserita non è un dato numerico.");
+    		return;
+    	}
     	
     }
 

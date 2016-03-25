@@ -23,12 +23,12 @@ public class SegreteriaModel {
 	
 	//Data una matricola fornisce lo studente
 	
-	public Studente getStudente(String matricola){
+	public Studente getStudente(int matricola){
 		StudenteDAO dao = new StudenteDAO();
 		Studente stemp = dao.getStudenteFromDB(matricola);
 		//Gestione matricola inesistente o nulla
 		if(stemp == null){
-			return new Studente(null, null, null, null);
+			return new Studente(-1, null, null, null);
 		}
 		else return stemp;
 	}
@@ -38,9 +38,9 @@ public class SegreteriaModel {
 	public String segueCorso(Corso corso){
 		List<Studente> studentiCorso = new ArrayList<Studente>();
 		StudenteDAO dao = new StudenteDAO();
-		List<String> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(corso);
+		List<Integer> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(corso);
 		//Popolo la lista di studenti per scriverli in un'unica stringa
-		for(String matricola : matricoleCorso){
+		for(int matricola : matricoleCorso){
 			Studente stemp = this.getStudente(matricola);
 			studentiCorso.add(stemp);
 		}
@@ -73,7 +73,7 @@ public class SegreteriaModel {
 	
 	public boolean corsoHaStudente(Corso c, Studente s){
 		StudenteDAO dao = new StudenteDAO();
-		List<String> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(c);
+		List<Integer> matricoleCorso = dao.getMatricoleIscrittiCorsiFromDB(c);
 		if(matricoleCorso.contains(s.getMatricola())){
 			return true;
 		}

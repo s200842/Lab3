@@ -14,14 +14,14 @@ public class StudenteDAO {
 	
 	//Cerca nel DB lo studente con la matricola data
 	
-	public Studente getStudenteFromDB(String matricola){
+	public Studente getStudenteFromDB(int matricola){
 		//Connessione al DB
 		try{
 			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
 			Connection c = DriverManager.getConnection(jdbcURL);
 			Statement st = c.createStatement();
 			//Gestione matricola vuota o non numerica
-			if(matricola.compareTo("")==0){
+			if(matricola == 0){
 				return null;
 			}
 			String sql = "SELECT nome, cognome, cds FROM studente WHERE matricola = "+matricola+";";
@@ -51,7 +51,7 @@ public class StudenteDAO {
 	
 	//Cerca nel DB gli studenti che seguono il corso specificato
 	
-	public List<String> getMatricoleIscrittiCorsiFromDB(Corso corso){
+	public List<Integer> getMatricoleIscrittiCorsiFromDB(Corso corso){
 		//Connessione al DB
 		try{
 			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
@@ -60,9 +60,9 @@ public class StudenteDAO {
 			String sql = "SELECT matricola FROM iscrizione WHERE codins = '"+corso.getCodIns()+"';";
 			ResultSet res = st.executeQuery(sql);
 			//Gestione dei dati
-			List<String> elencoMatricoleIscritti = new ArrayList<String>();
+			List<Integer> elencoMatricoleIscritti = new ArrayList<Integer>();
 			while(res.next()){
-				String matricola = res.getString("matricola");
+				int matricola = res.getInt("matricola");
 				elencoMatricoleIscritti.add(matricola);
 			}
 			res.close();
