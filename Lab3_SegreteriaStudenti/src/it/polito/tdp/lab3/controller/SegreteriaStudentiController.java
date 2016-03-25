@@ -151,29 +151,46 @@ public class SegreteriaStudentiController {
     	txtNome.setDisable(true);
     	txtCognome.setDisable(true);
     	
-    	Studente stemp = model.getStudente(Integer.parseInt(txtInput.getText()));
-    	Corso ctemp = boxCorsi.getValue();
-    	
-    	//CONTROLLI PRELIMINARI : Controllo selezione corso
-    	if(ctemp == null || ctemp.getNomeCorso().compareTo("") == 0){
-    		txtResult.setText("Selezionare un corso a cui si desidera iscrivere lo studente.");
-    		return;
+    	try {
+    		Studente stemp = model.getStudente(Integer.parseInt(txtInput.getText()));
+    		Corso ctemp = boxCorsi.getValue();
+    		
+    		//CONTROLLI PRELIMINARI : Controllo selezione corso
+        	if(ctemp == null || ctemp.getNomeCorso().compareTo("") == 0){
+        		txtResult.setText("Selezionare un corso a cui si desidera iscrivere lo studente.");
+        		return;
+        	}
+        	//CONTROLLI PRELIMINARI : studente non presente nel DB
+        	else if(stemp.getMatricola() == -1){
+        		txtResult.setText("La matricola specificata non è presente nel DataBase.");
+        		return;
+        	}	
+        	//Ho un corso e una matricola valida; se lo studente non è iscritto al corso lo iscrivo
+        	else if(model.corsoHaStudente(ctemp, stemp) == true){
+        		txtResult.setText(String.format("Lo studente %s %s (%s) risulta già iscritto al corso %s", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.toString()));
+        		return;
+        	}
+        	else{
+        		//Iscrivo lo studente al corso scelto
+        		if(model.iscriviStudente(stemp, ctemp) == true){
+        			txtResult.setText(String.format("Lo studente %s %s (%s) è stato iscritto al corso %s con successo.", stemp.getNomeStudente(), stemp.getCognomeStudente(), stemp.getMatricola(), ctemp.toString()));
+        		}
+        		else{
+        			txtResult.setText("Errore inserimento studente.");
+        		}
+        	}
     	}
-    	//CONTROLLI PRELIMINARI : Controllo matricola inesistente
-    	if(stemp.getMatricola() == 0){
-    		txtResult.setText("La matricola selezionata non è scritta nel formato corretto o non è stata inserita.");
-    		return;
-    	}
-    	//Controlla se lo studente è già iscritto al corso specificato
-    	//CONTROLLI PRELIMINARI : Controllo matricola non numerica
-    	try{
-    		Integer.parseInt(txtInput.getText());
-    	} 
     	catch(NumberFormatException e){
-    		txtResult.setText("La matricola inserita non è un dato numerico.");
-    		return;
-    	}
-    	
+    		//Matricola vuota
+    		if(txtInput.getText().compareTo("") == 0){
+    			txtResult.setText("Specificare la matricola dello studente da iscrivere.");
+    			return;
+    		}
+    		else{ //Matricola non numerica
+    			txtResult.setText("Formato matricola errato");
+    			return;
+    		}
+    	}	
     }
 
     @FXML

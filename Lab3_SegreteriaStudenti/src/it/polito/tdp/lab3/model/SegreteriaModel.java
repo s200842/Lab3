@@ -86,4 +86,11 @@ public class SegreteriaModel {
 			return false;
 		}
 	}
+	
+	//Iscrive lo studente al corso specificato
+	public boolean iscriviStudente(Studente s, Corso c){
+		CorsoDAO dao = new CorsoDAO();
+		return dao.iscrivi(s, c);
+		
+	}
 }

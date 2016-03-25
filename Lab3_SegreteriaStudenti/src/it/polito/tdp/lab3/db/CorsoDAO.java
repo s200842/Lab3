@@ -86,6 +86,23 @@ public class CorsoDAO {
 		
 	}
 	
+	public boolean iscrivi(Studente s, Corso c){
+		//Apertura connessione con database
+		try {
+			String jdbcURL = "jdbc:mysql://localhost/iscritticorsi?user=root";
+			Connection con = DriverManager.getConnection(jdbcURL);
+			Statement st = con.createStatement();
+			String sql = "INSERT INTO iscritticorsi.iscrizione (matricola, codins) VALUES ("+s.getMatricola()+", '"+c.getCodIns()+"');";
+			int result = st.executeUpdate(sql);
+			if(result == 1){
+				return true;
+			}
+			else return false;
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}			
+		return false;
+	}
 	
-
 }
